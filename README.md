@@ -16,9 +16,11 @@ Press `CTRL + SHIFT + P` on Windows and Linux and `CMD + SHIFT + P` on a Mac to 
 
 Plugin only works in files using Django or Jinja syntax.
 
-### Add Keybinding
+### Keybinding
 
-Open your User Keybinding File and add the following keybinding to activate the toggle command in all file types:
+Package includes default keybinding to `ctrl+shift+.`. That means you can use `ctrl+shift+.` to create and toggle between Django template tags.
+
+You can also override the default binding and define your own shortcut by following the next example:
 
 ```json
   [
@@ -26,7 +28,7 @@ Open your User Keybinding File and add the following keybinding to activate the 
   ]
 ```
 
-Now you can use `ctrl+shift+.` to create and toggle between Django template tags. NOTE: On a Mac use the command key for the ctrl key.
+NOTE: On a Mac use the command key for the ctrl key.
 
 Sample
 ----------
