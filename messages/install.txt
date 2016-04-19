@@ -1,0 +1,10 @@
+Django Tags
+===========
+
+Thank you for installing Django Tags!
+
+Hope you find it useful. Feel free to give feedback, report an issue or make even a pull request.
+
+
+GitHub: https://github.com/Jeewes/SublimeDjangoTags
+Issue tracker: https://github.com/Jeewes/SublimeDjangoTags/issues
