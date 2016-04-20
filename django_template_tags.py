@@ -7,7 +7,7 @@ import re
 DTL_TAGS = [
     ['{{ ', ' }}'],
     ['{% ', ' %}'],
-    ['{% trans("', '") %}'],
+    ['{% trans "', '" %}'],
 ]
 
 JINJA_TAGS = [
@@ -17,9 +17,9 @@ JINJA_TAGS = [
 ]
 
 # Regex to match opening brackets.
-TAG_OPENER_REGEX = '{{ _\("|{{ |{% trans\("|{% '
+TAG_OPENER_REGEX = '{{ _\("|{{ |{% trans\ "|{% '
 # Regex to match the closing brackets.
-TAG_CLOSER_REGEX = '"\) }}| }}|"\) %}| %}'
+TAG_CLOSER_REGEX = '"\) }}| }}|"\ %}| %}'
 
 
 class DjangoTagCommand(sublime_plugin.TextCommand):
