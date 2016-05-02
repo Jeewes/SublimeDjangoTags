@@ -23,9 +23,9 @@ Package includes default keybinding to `ctrl+shift+.`. That means you can use `c
 You can also override the default binding and define your own shortcut by following the next example:
 
 ```json
-  [
+[
     { "keys": ["ctrl+shift+."], "command": "django_tag" }
-  ]
+]
 ```
 
 NOTE: On a Mac use the command key for the ctrl key.
