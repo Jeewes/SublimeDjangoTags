@@ -10,7 +10,7 @@ Fork of [eddorre/SublimeERB](https://github.com/eddorre/SublimeERB) supporting D
 
 Use [Sublime Package Control](https://packagecontrol.io/). Once you have Sublime Package control installed, you can install "SublimeDjangoTags" in a few easy steps.
 
-Press `CTRL + SHIFT + P` on Windows and Linux and `CMD + SHIFT + P` on a Mac to bring up Sublime's Command Palette, then type `install package` to bring up Package Control's package selector. It should be the first selection. Type "SublimeERB," which, again, should be the first selection, and then hit enter. You should now have the proper package installed, but you will still need to [add a keybinding to use it.](#add-keybinding)
+Press `CTRL + SHIFT + P` on Windows and Linux and `CMD + SHIFT + P` on a Mac to bring up Sublime's Command Palette, then type `install package` to bring up Package Control's package selector. It should be the first selection. Type "Django Tags," which, again, should be the first selection, and then hit enter. You should now have the proper package installed, but you will still need to [add a keybinding to use it.](#add-keybinding)
 
 ## Usage
 
