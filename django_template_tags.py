@@ -48,11 +48,7 @@ class DjangoTagCommand(sublime_plugin.TextCommand):
 
     def is_valid_context(self):
         has_selections = (len(self.view.sel()) > 0)
-        self.syntax = self.view.settings().get("syntax").lower()
-        supported_syntax = (
-            "jinja" in self.syntax or "django" in self.syntax
-        )
-        return has_selections and supported_syntax
+        return has_selections
 
     def handle_selection(self, region, edit):
         """
