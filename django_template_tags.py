@@ -25,10 +25,7 @@ TAG_CLOSER_REGEX = '"\) }}| }}|"\ %}| %}'
 class DjangoTagCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
-        if not self.is_valid_context():
-            sublime.status_message(
-                "DjangoTag: Unsupported syntax (try Django or Jinja syntax)"
-            )
+        if len(self.view.sel()) <= 0:
             return
 
         # Storing all new cursor positions to ensure
@@ -45,14 +42,6 @@ class DjangoTagCommand(sublime_plugin.TextCommand):
         # Looping through the modified selections and adding them
         for selection in new_selections:
             self.view.sel().add(selection)
-
-    def is_valid_context(self):
-        has_selections = (len(self.view.sel()) > 0)
-        self.syntax = self.view.settings().get("syntax").lower()
-        supported_syntax = (
-            "jinja" in self.syntax or "django" in self.syntax
-        )
-        return has_selections and supported_syntax
 
     def handle_selection(self, region, edit):
         """
