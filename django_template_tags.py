@@ -49,7 +49,7 @@ class DjangoTagCommand(sublime_plugin.TextCommand):
         Returns: new cursor position.
         """
         # Search opening and closing brackets
-        opener, closer = self.find_surrounding_blocks(region)
+        opener, closer = self.find_surrounding_brackets(region)
 
         if (opener is not None) and (closer is not None):
             # Brackets found - replacing them with the next ones.
@@ -62,6 +62,7 @@ class DjangoTagCommand(sublime_plugin.TextCommand):
         opener = None
         closer = None
 
+    def find_surrounding_brackets(self, region):
         # Grab the whole line
         containing_line = self.view.line(region)
 
