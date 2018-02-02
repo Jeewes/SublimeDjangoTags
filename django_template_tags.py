@@ -1,25 +1,8 @@
 # -*- coding: utf-8 -*-
 import sublime
 import sublime_plugin
-import re
 
-
-DTL_TAGS = [
-    ['{{ ', ' }}'],
-    ['{% ', ' %}'],
-    ['{% trans "', '" %}'],
-]
-
-JINJA_TAGS = [
-    ['{{ ', ' }}'],
-    ['{% ', ' %}'],
-    ['{{ _("', '") }}']
-]
-
-# Regex to match opening brackets.
-TAG_OPENER_REGEX = '{{ _\("|{{ |{% trans\ "|{% '
-# Regex to match the closing brackets.
-TAG_CLOSER_REGEX = '"\) }}| }}|"\ %}| %}'
+from .brackets import get_brackets_for_syntax
 
 
 class DjangoTagCommand(sublime_plugin.TextCommand):
@@ -34,6 +17,7 @@ class DjangoTagCommand(sublime_plugin.TextCommand):
 
         # Looping through each selection (Sublime supports multiple cursors)
         for region in self.view.sel():
+            self.bracket_set = self.get_brackets(region)
             new_selections.append(self.handle_selection(region, edit))
 
         # Clear current selections
@@ -45,80 +29,72 @@ class DjangoTagCommand(sublime_plugin.TextCommand):
 
     def handle_selection(self, region, edit):
         """
-        Add new tag or replace existing tag if found.
+        Add brackets or replace existing if found.
         Returns: new cursor position.
         """
         # Search opening and closing brackets
         opener, closer = self.find_surrounding_brackets(region)
-
         if (opener is not None) and (closer is not None):
             # Brackets found - replacing them with the next ones.
-            return self.replace_tag(edit, opener, closer, region)
+            return self.replace_brackets(edit, opener, closer, region)
         else:
             # Brackets weren't found - inserting new ones.
-            return self.insert_tag(edit, region)
+            return self.insert_brackets(edit, region)
 
-    def find_surrounding_blocks(self, region):
-        opener = None
-        closer = None
+    def find_existing_opening_brackets(self, region):
+        text = self.view.substr(region)
+        index, bracket = self.bracket_set.find_opener_from_text(text)
+        if bracket:
+            # Create a region using the last match (rightmost matches found)
+            start = region.begin() + index
+            end = start + len(bracket)
+            return sublime.Region(start, end)
+
+        return None
+
+    def find_existing_closing_brackets(self, region):
+        text = self.view.substr(region)
+        index, bracket = self.bracket_set.find_closer_from_text(text)
+        if bracket:
+            start = region.begin() + index
+            end = start + len(bracket)
+            return sublime.Region(start, end)
+
+        return None
 
     def find_surrounding_brackets(self, region):
-        # Grab the whole line
         containing_line = self.view.line(region)
 
-        # One region to the left of the selection and one to the right
         left_region = sublime.Region(containing_line.begin(), region.begin())
         right_region = sublime.Region(containing_line.end(), region.end())
-        text_to_left = self.view.substr(left_region)
-        text_to_right = self.view.substr(right_region)
-        # Search from the left region for opening brackets
-        found_openers = list(re.finditer(TAG_OPENER_REGEX, text_to_left))
-        if len(found_openers) > 0:
-            # Create a region using the last match (rightmost brackets found)
-            opener = sublime.Region(
-                left_region.begin() + found_openers[-1].start(),
-                left_region.begin() + found_openers[-1].end()
-            )
 
-        # Search for closing brckets from the right region
-        found_closers = list(re.finditer(TAG_CLOSER_REGEX, text_to_right))
-        if len(found_closers) > 0:
-            # Create a region using the first match (leftmost brackets found)
-            closer = sublime.Region(
-                right_region.begin() + found_closers[0].start(),
-                right_region.begin() + found_closers[0].end()
-            )
-
+        opener = self.find_existing_opening_brackets(left_region)
+        closer = self.find_existing_closing_brackets(right_region)
         return opener, closer
 
-    def get_tags(self):
-        """Return tags according to the syntax used."""
-        if "jinja" in self.syntax:
-            return JINJA_TAGS
-        return DTL_TAGS
+    def get_brackets(self, region):
+        """Return bracket set according to the syntax in use."""
+        syntax = self.view.scope_name(region.begin())
+        return get_brackets_for_syntax(syntax)
 
-    def insert_tag(self, edit, region):
-        tags = self.get_tags()
-        # Insert the first block in the list
-        opener, closer = tags[0][0], tags[0][1]
+    def insert_brackets(self, edit, region):
+        brackets = self.bracket_set[0]
         # Insert in reverse order because line length might change
-        self.view.insert(edit, region.end(), closer)
-        inserted_before = self.view.insert(edit, region.begin(), opener)
+        self.view.insert(edit, region.end(), brackets[1])
+        inserted_before = self.view.insert(edit, region.begin(), brackets[0])
         # Return a region, shifted by the number of inserted characters
         # before the cursor
         return sublime.Region(
             region.begin() + inserted_before, region.end() + inserted_before
         )
 
-    def replace_tag(self, edit, opener, closer, region):
-        # Get the next block in the list
-        next_block = self.get_next_tag(
+    def replace_brackets(self, edit, opener, closer, region):
+        next_block = self.get_next_brackets(
             self.view.substr(opener), self.view.substr(closer)
         )
 
         # Calculate how many characters the selection will change
         delta = len(next_block[0]) - len(self.view.substr(opener))
-
         # Replace in reverse order because line length might change
         self.view.replace(edit, closer, next_block[1])
         self.view.replace(edit, opener, next_block[0])
@@ -126,15 +102,12 @@ class DjangoTagCommand(sublime_plugin.TextCommand):
         # Return a region, shifted by the delta
         return sublime.Region(region.begin() + delta, region.end() + delta)
 
-    def get_next_tag(self, opening_brackets, closing_brackets):
-        tags = self.get_tags()
-        for i, tag in enumerate(tags):
-            if [opening_brackets, closing_brackets] == tag:
-                if i + 1 >= len(tags):
-                    # Outside of scope - returning the first tag
-                    return tags[0]
+    def get_next_brackets(self, opening_brackets, closing_brackets):
+        for i, brackets in enumerate(self.bracket_set):
+            if [opening_brackets, closing_brackets] == brackets:
+                if i + 1 >= len(self.bracket_set):
+                    return self.bracket_set[0]
                 else:
-                    return tags[i + 1]
+                    return self.bracket_set[i + 1]
 
-        # We haven't found the tag from the list, returning the first one
-        return tags[0]
+        return self.bracket_set[0]
