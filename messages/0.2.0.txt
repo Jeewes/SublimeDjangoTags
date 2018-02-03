@@ -1,0 +1,8 @@
+Django Tags
+===========
+
+New in version 0.2.0
+--------------------
+
+- Use default set of brackets (i.e. (), [] and {}) when syntax scope specific brackets aren't available.
+- Add support for Javascript brackets

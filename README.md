@@ -14,8 +14,6 @@ Press `CTRL + SHIFT + P` on Windows and Linux and `CMD + SHIFT + P` on a Mac to 
 
 ## Usage
 
-Plugin only works in files using Django or Jinja syntax.
-
 ### Keybinding
 
 Package includes default keybinding to `ctrl+shift+.`. That means you can use `ctrl+shift+.` to create and toggle between Django template tags.
@@ -37,4 +35,4 @@ Sample
 Copyright
 ---------
 
-**SublimeDjangoTags** is Copyright (c) 2016 [Jeewes](https://github.com/Jeewes), released under the MIT License.
+**SublimeDjangoTags** is Copyright (c) 2018 [Jeewes](https://github.com/Jeewes), released under the MIT License.
